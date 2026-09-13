@@ -1,0 +1,12 @@
+{"timestamp":"00:00:32.345","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:35.609","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:00:47.534","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:49.821","source":"Browser","level":"WARN","message":"THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."}
+{"timestamp":"00:00:49.854","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mTHREE.Clock: This module has been deprecated. Please use THREE.Timer instead.\\u001b[39m\""}
+{"timestamp":"00:00:53.779","source":"Browser","level":"WARN","message":"THREE.WebGLProgram: Program Info Log: (257,1): warning X4000: use of potentially uninitialized variable (f_vizFor_int)\n\n\n\u0000"}
+{"timestamp":"00:00:53.788","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mTHREE.WebGLProgram: Program Info Log:\\u001b[39m\" \"\\u001b[33m(257,1): warning X4000: use of potentially uninitialized variable (f_vizFor_int)\\n\\n\\n\\u0000\\u001b[39m\""}
+{"timestamp":"00:02:06.364","source":"Browser","level":"WARN","message":"Image with src \"/insights/fincore.webp\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\"eager\"` property if this image is above the fold.\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading"}
+{"timestamp":"00:02:06.396","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"/insights/fincore.webp\\\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\\\"eager\\\"` property if this image is above the fold.\\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading\\u001b[39m\""}
+{"timestamp":"00:02:09.484","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:02:11.455","source":"Browser","level":"WARN","message":"THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."}
+{"timestamp":"00:02:11.456","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mTHREE.Clock: This module has been deprecated. Please use THREE.Timer instead.\\u001b[39m\""}
