@@ -15,6 +15,7 @@ import { useAppStore } from "@/store/useAppStore";
  */
 export function Technology() {
   const root = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLUListElement>(null);
   const active = useAppStore((s) => s.activeTech);
   const setActive = useAppStore((s) => s.setActiveTech);
 
@@ -24,6 +25,9 @@ export function Technology() {
     const el = root.current;
     if (!el) return;
     const ctx = gsap.context(() => {
+      // Pinned, the list is on screen as soon as the frame is; flowing (below
+      // lg) it sits under the copy, so it waits until it is actually in view.
+      const flowing = !window.matchMedia("(min-width: 1024px)").matches;
       gsap.fromTo(
         "[data-tech-row]",
         { opacity: 0, x: 18 },
@@ -33,20 +37,30 @@ export function Technology() {
           duration: 0.9,
           ease: "expo.out",
           stagger: 0.035,
-          scrollTrigger: { trigger: el, start: "top 60%", once: true },
+          scrollTrigger: flowing
+            ? { trigger: list.current, start: "top 88%", once: true }
+            : { trigger: el, start: "top 60%", once: true },
         },
       );
     }, el);
     return () => ctx.revert();
   }, []);
 
+  // A tap is not a hover: on touch, pointerleave follows every pointerup and
+  // would clear the selection the tap just made.
+  const hover = (e: React.PointerEvent, i: number) => {
+    if (e.pointerType !== "touch") setActive(i);
+  };
+
   return (
-    <Section id="technology" className="h-[140vh]" label="Technology">
-      <div ref={root} className="h-full">
-        <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden [contain:layout_paint]">
+    <Section id="technology" className="lg:h-[140vh]" label="Technology">
+      {/* Pinned from lg only — see Services: a phone screen cannot hold the
+          copy, the focus panel and the list at once without clipping them. */}
+      <div ref={root} className="lg:h-full">
+        <div className="relative flex flex-col justify-center py-28 [contain:layout_paint] md:py-36 lg:sticky lg:top-0 lg:h-[100svh] lg:overflow-hidden lg:py-0">
           <SectionScrim />
           <SectionScrim variant="left" />
-          <div className="relative z-10 shell grid w-full gap-8 pt-16 lg:grid-cols-12 lg:gap-8 lg:pt-0">
+          <div className="relative z-10 shell grid w-full gap-12 lg:grid-cols-12 lg:gap-8">
             <div className="lg:col-span-5">
               <Eyebrow index="02">Technology</Eyebrow>
               <Heading
@@ -90,8 +104,9 @@ export function Technology() {
 
             <div className="lg:col-span-5 lg:col-start-8 lg:self-center">
               <ul
+                ref={list}
                 className="grid grid-cols-2 gap-x-6 gap-y-0 lg:grid-cols-1"
-                onPointerLeave={() => setActive(-1)}
+                onPointerLeave={(e) => hover(e, -1)}
               >
                 {TECHNOLOGIES.map((tech, i) => {
                   const isActive = active === i;
@@ -100,7 +115,8 @@ export function Technology() {
                       <button
                         type="button"
                         data-cursor="hover"
-                        onPointerEnter={() => setActive(i)}
+                        onPointerEnter={(e) => hover(e, i)}
+                        onClick={() => setActive(i)}
                         onFocus={() => setActive(i)}
                         onBlur={() => setActive(-1)}
                         className="group flex w-full items-center gap-3 border-b border-hairline py-3 text-left lg:gap-4 lg:py-3.5"

@@ -8,6 +8,7 @@ import { useIsomorphicLayoutEffect, gsap, EASE } from "@/lib/gsap";
 import { interaction } from "@/lib/interaction";
 import { COMPANY } from "@/data/company";
 import { scrimStop } from "@/components/ui/Overlays";
+import { InstagramLink } from "@/components/ui/Instagram";
 
 /**
  * The closing shot. Every screen folds into a tunnel converging on a single
@@ -124,6 +125,10 @@ export function CTA() {
                 {COMPANY.phone}
                 <span className="mt-0.5 block h-px w-full origin-left scale-x-0 bg-ion transition-transform duration-500 group-hover:scale-x-100" />
               </a>
+              <span className="group font-mono text-[0.75rem] tracking-[0.06em] text-fog transition-colors text-shadow-scrim hover:text-chalk">
+                <InstagramLink />
+                <span className="mt-0.5 block h-px w-full origin-left scale-x-0 bg-ion transition-transform duration-500 group-hover:scale-x-100" />
+              </span>
               <span className="font-mono text-[0.75rem] tracking-[0.06em] text-fog text-shadow-scrim">
                 {COMPANY.address}
               </span>

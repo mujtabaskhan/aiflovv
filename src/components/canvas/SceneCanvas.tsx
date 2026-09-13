@@ -22,8 +22,11 @@ export default function SceneCanvas() {
   }, []);
 
   return (
+    // Sized to the large viewport, not the visible one: a mobile browser's
+    // toolbar resizes the visible viewport as it slides, and every resize
+    // reallocates the drawing buffer and the whole post-processing chain.
     <div
-      className="pointer-events-none fixed inset-0 z-0"
+      className="pointer-events-none fixed inset-x-0 top-0 z-0 h-lvh"
       aria-hidden="true"
       data-canvas-root
     >

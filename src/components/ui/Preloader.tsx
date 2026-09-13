@@ -5,7 +5,6 @@ import { gsap, useIsomorphicLayoutEffect, EASE } from "@/lib/gsap";
 import { journey } from "@/lib/journey";
 import { useAppStore } from "@/store/useAppStore";
 import { stopScroll } from "@/components/providers/SmoothScroll";
-import { COMPANY } from "@/data/company";
 import { Logo } from "@/components/ui/Logo";
 
 const MIN_DURATION = 1500;
@@ -127,9 +126,8 @@ export function Preloader() {
       ref={root}
       className="fixed inset-0 z-[120] flex flex-col justify-between bg-void px-6 py-6 md:px-10 md:py-10"
     >
-      <div ref={mark} className="flex items-center justify-between gap-6">
+      <div ref={mark} className="flex items-center">
         <Logo variant="full" className="h-9 md:h-11" />
-        <span className="eyebrow hidden sm:block">{COMPANY.descriptor}</span>
       </div>
 
       <div className="flex items-end justify-between gap-8">

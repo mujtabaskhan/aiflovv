@@ -15,13 +15,19 @@ const GRAIN =
     </svg>`,
   );
 
-/** Film grain + a soft radial lift behind the centre of the frame. */
+/**
+ * Film grain + a soft radial lift behind the centre of the frame.
+ *
+ * No grain on phones: a blend mode on a full-screen layer makes the browser
+ * composite the entire page underneath it again on every frame of scroll —
+ * a real cost on a mobile GPU for texture that small a screen barely shows.
+ */
 export function Grain() {
   return (
     <>
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-[70] opacity-[0.055] mix-blend-overlay"
+        className="pointer-events-none fixed inset-0 z-[70] opacity-[0.055] mix-blend-overlay max-md:hidden"
         style={{
           backgroundImage: `url("${GRAIN}")`,
           backgroundSize: "220px 220px",

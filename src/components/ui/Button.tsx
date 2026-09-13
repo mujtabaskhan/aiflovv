@@ -29,7 +29,7 @@ const SIZES = {
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-chalk text-void hover:text-void",
   ghost:
-    "border border-chalk/25 text-chalk backdrop-blur-sm transition-[border-color] hover:border-chalk/60 hover:text-void",
+    "border border-chalk/25 text-chalk transition-[border-color] hover:border-chalk/60 hover:text-void md:backdrop-blur-sm",
   line: "text-chalk hover:text-ion",
 };
 
@@ -46,7 +46,7 @@ export function Button({
   const fill = useRef<HTMLSpanElement>(null);
 
   const onMove = (e: React.PointerEvent) => {
-    if (!magnetic || !ref.current) return;
+    if (!magnetic || e.pointerType === "touch" || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
     const x = e.clientX - (r.left + r.width / 2);
     const y = e.clientY - (r.top + r.height / 2);

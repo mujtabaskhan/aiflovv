@@ -81,6 +81,10 @@ export function detectTier(): QualityTier {
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const narrow = window.innerWidth < 900;
 
+  // Phones: a mobile GPU filling a dense screen, where bloom and aberration
+  // cost more frames than they add — and specs say little, since browsers
+  // cap or hide what they report.
+  if (coarse && narrow) return "low";
   if (coarse || narrow) return memory <= 4 || cores <= 4 ? "low" : "mid";
   if (cores <= 4 || memory <= 4) return "mid";
   return "high";

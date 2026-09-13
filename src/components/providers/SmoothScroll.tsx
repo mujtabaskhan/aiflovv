@@ -76,9 +76,26 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     const t2 = window.setTimeout(remeasure, 600);
     if (document.fonts?.ready) void document.fonts.ready.then(remeasure);
 
+    // A mobile toolbar sliding in or out changes only the visible height, and
+    // nothing is laid out against that (sections use vh/svh, which hold
+    // still) — so it gets the new viewport metrics, not a full re-measure
+    // and trigger refresh on every frame of the slide.
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
     let resizeRaf = 0;
     const onResize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const toolbar =
+        ScrollTrigger.isTouch === 1 && w === lastWidth && Math.abs(h - lastHeight) < h * 0.25;
       cancelAnimationFrame(resizeRaf);
+      if (toolbar) {
+        journey.viewport.height = h;
+        journey.viewport.aspect = w / Math.max(1, h);
+        return;
+      }
+      lastWidth = w;
+      lastHeight = h;
       resizeRaf = requestAnimationFrame(remeasure);
     };
     window.addEventListener("resize", onResize, { passive: true });

@@ -3,12 +3,13 @@
 import { COMPANY, NAV_LINKS } from "@/data/company";
 import { scrollToSection } from "@/components/providers/SmoothScroll";
 import { Logo } from "@/components/ui/Logo";
+import { InstagramLink } from "@/components/ui/Instagram";
 
 export function Footer() {
   const year = 2026;
 
   return (
-    <footer className="relative z-10 border-t border-hairline bg-void/70 backdrop-blur-xl">
+    <footer className="relative z-10 border-t border-hairline bg-void/90 md:bg-void/70 md:backdrop-blur-xl">
       <div className="shell py-14 md:py-16">
         <div className="grid gap-10 md:grid-cols-12 md:gap-8">
           <div className="md:col-span-5">
@@ -60,6 +61,9 @@ export function Footer() {
                 >
                   {COMPANY.phone}
                 </a>
+              </li>
+              <li>
+                <InstagramLink className="text-[0.875rem] text-fog transition-colors hover:text-chalk" />
               </li>
               <li className="mt-2 max-w-[26ch] text-[0.875rem] leading-relaxed text-mist">
                 {COMPANY.address}

@@ -8,6 +8,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { scrollToSection, stopScroll } from "@/components/providers/SmoothScroll";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
+import { InstagramLink } from "./Instagram";
 
 export function Nav() {
   const entered = useAppStore((s) => s.entered);
@@ -189,7 +190,7 @@ export function Nav() {
       <div
         ref={menu}
         data-chrome
-        className="pointer-events-none fixed inset-0 z-[95] flex flex-col justify-center bg-void/95 pt-24 backdrop-blur-2xl"
+        className="pointer-events-none fixed inset-0 z-[95] flex flex-col justify-center bg-void/95 pt-24 md:backdrop-blur-2xl"
         style={{ clipPath: "inset(0% 0% 100% 0%)" }}
       >
         <nav className="shell flex flex-col gap-1" aria-label="Mobile">
@@ -210,10 +211,11 @@ export function Nav() {
               </span>
             </a>
           ))}
-          <div data-menu-item className="mt-10">
+          <div data-menu-item className="mt-10 flex flex-wrap items-center justify-between gap-6">
             <Button href="#cta" variant="primary" size="lg" magnetic={false}>
               Start a Project
             </Button>
+            <InstagramLink className="font-mono text-[0.75rem] tracking-[0.06em] text-fog transition-colors hover:text-chalk" />
           </div>
         </nav>
       </div>

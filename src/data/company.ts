@@ -3,11 +3,26 @@ export const COMPANY = {
   wordmark: "AIFLOVV",
   tagline: "AI-Driven. Developed. Worldwide.",
   descriptor: "Digital Product & Software Studio",
+  /** Search and app-store description — kept under ~160 characters. */
+  summary:
+    "AiFlovv designs and builds high-performance websites, custom software, mobile apps and UI/UX for ambitious businesses — from Lahore, for clients worldwide.",
+  /** The line shown when the site is shared. */
+  pitch:
+    "We turn ambitious ideas into intelligent digital products, powerful brands, and technology built for measurable growth.",
+  url: "https://aiflovv.com",
   founded: 2024,
   locations: ["Lahore"],
   email: "info@aiflovv.com",
   phone: "+92 332 1722442",
+  instagram: { handle: "@aiflovv", url: "https://www.instagram.com/aiflovv/" },
   address: "Commercial Area Sector C, Bahria Town, Lahore",
+  /** `address`, split into its postal parts for structured data. */
+  postal: {
+    street: "Commercial Area, Sector C, Bahria Town",
+    locality: "Lahore",
+    region: "Punjab",
+    country: "PK",
+  },
 } as const;
 
 export const NAV_LINKS = [

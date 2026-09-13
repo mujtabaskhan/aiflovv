@@ -129,21 +129,25 @@ function HeroProbe() {
   const tag = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    // Always running: it stays at zero opacity unless a mouse is hovering.
+    // Always running: it stays at zero opacity unless a mouse is hovering —
+    // and writes nothing while it does, which on touch is always.
     let raf = 0;
     let shown = "";
+    let hidden = true;
 
     const tick = () => {
       const p = interaction.heroProbe;
       const node = el.current;
-      if (node) {
+      const idle = p.active < 0.002;
+      if (node && !(idle && hidden)) {
+        hidden = idle;
         if (p.kind && p.kind !== shown) {
           shown = p.kind;
           const [t, g] = HERO_LABELS[p.kind] ?? ["", ""];
           if (title.current) title.current.textContent = t;
           if (tag.current) tag.current.textContent = g;
         }
-        node.style.opacity = p.active.toFixed(3);
+        node.style.opacity = idle ? "0" : p.active.toFixed(3);
         node.style.transform = `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) translate(-4px, calc(-100% - 10px)) scale(${(0.94 + p.active * 0.06).toFixed(3)})`;
       }
       raf = requestAnimationFrame(tick);

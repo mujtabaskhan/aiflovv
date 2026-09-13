@@ -326,7 +326,10 @@ export default function IntroAnimation({
             if (introRef.current) {
                 introRef.current.style.opacity = introO.toFixed(3);
                 introRef.current.style.transform = `translateY(${((1 - introO) * 14).toFixed(1)}px)`;
-                introRef.current.style.filter = introO > 0.98 ? "none" : `blur(${((1 - introO) * 8).toFixed(1)}px)`;
+                // No filter at either end: a blur left on the hidden title is
+                // still a filter the compositor carries through every frame.
+                introRef.current.style.filter =
+                    introO > 0.98 || introO < 0.02 ? "none" : `blur(${((1 - introO) * 8).toFixed(1)}px)`;
             }
             if (hintRef.current) hintRef.current.style.opacity = (introO * 0.55).toFixed(3);
             const arcO = ease(clamp01((morphT - 0.7) / 0.3));
