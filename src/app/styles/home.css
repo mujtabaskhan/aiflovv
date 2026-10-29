@@ -1,0 +1,247 @@
+/* ================================================================
+   Home — hero (the one fully dark, full-screen moment)
+   ================================================================ */
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 700px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-void);
+}
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(38% 46% at 74% 44%, rgb(255 255 255 / 0.06), transparent 70%),
+    radial-gradient(30% 40% at 12% 40%, rgb(255 255 255 / 0.025), transparent 70%);
+}
+@media (max-width: 899px) {
+  .hero-glow {
+    background: radial-gradient(60% 34% at 50% 26%, rgb(255 255 255 / 0.07), transparent 70%);
+  }
+}
+.hero-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 26%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-void));
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2.25rem;
+  padding-bottom: max(clamp(2rem, 6vh, 4.5rem), 7.5vw);
+}
+@media (min-width: 900px) {
+  .hero-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 3rem;
+  }
+}
+@media (max-width: 899px) {
+  .hero-content {
+    padding-bottom: 5.5rem;
+  }
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6.5vw, 8.4rem);
+  font-weight: 700;
+  font-stretch: 118%;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+}
+.ht-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.ht-part {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Rolling text: letters lift out of / rise into a mask. */
+.roll {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  white-space: nowrap;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.rc {
+  display: inline-block;
+  will-change: transform;
+}
+.ht-word {
+  background: linear-gradient(100deg, #8fb0ff 0%, #6cd6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ht-word .rc {
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Service ticker */
+.ticker {
+  display: grid;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 30rem;
+  padding: 1.25rem 1.35rem 1.35rem;
+  background: rgb(6 9 20 / 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+@media (min-width: 900px) {
+  .ticker {
+    justify-self: end;
+  }
+}
+.ticker-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 1.2em;
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+  font-weight: 650;
+  font-stretch: 112%;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+/* Long service names shrink to fit the box on one line; short ones keep the full size.
+   1em is the title's normal size; the row keeps its height either way. */
+.ticker {
+  container-type: inline-size;
+}
+.ticker-title .roll {
+  font-size: min(1em, calc((100cqi - 1.9rem) / (var(--fit-line, 10) * 0.7)));
+}
+/* In a narrow box some blurbs take two lines: keep room for both so the box never resizes. */
+@container (max-width: 26rem) {
+  .ticker .ticker-blurb {
+    min-height: 3.25em;
+    min-height: 2lh;
+  }
+}
+.ticker-arrow {
+  flex: none;
+  color: var(--color-cyan);
+  transition: transform 0.35s var(--ease-flow);
+}
+.ticker-title:hover .ticker-arrow {
+  transform: translateX(4px);
+}
+.ticker-blurb {
+  min-height: 1.5em;
+  font-size: 0.95rem;
+  color: var(--color-soft);
+  animation: ticker-in 0.6s var(--ease-flow);
+}
+@keyframes ticker-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.ticker-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: -0.25rem;
+}
+.ticker-steps button {
+  position: relative;
+  flex: 1;
+  height: 26px;
+}
+.ticker-steps button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 11px;
+  height: 4px;
+  background: var(--color-line-strong);
+  transition: background 0.25s;
+}
+.ticker-steps button[data-brand]::before {
+  background: color-mix(in srgb, var(--color-blue) 45%, transparent);
+}
+.ticker-steps button:hover::before {
+  background: var(--color-soft);
+}
+.ticker-steps i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 11px;
+  height: 4px;
+  background: var(--grad);
+  transform-origin: left;
+  animation: ticker-fill var(--d, 2.6s) steps(16, end) forwards;
+}
+.ticker[data-paused="true"] .ticker-steps i {
+  animation-play-state: paused;
+}
+@keyframes ticker-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (max-width: 899px) {
+  .ticker {
+    order: 2;
+    padding: 1rem 1.1rem 1.1rem;
+    max-width: none;
+  }
+  .ticker-blurb {
+    display: none;
+  }
+  .hero .t-lead {
+    display: none;
+  }
+}
+@media (max-width: 899px) and (min-height: 900px) {
+  .hero .t-lead {
+    display: block;
+  }
+}
+
+.hero-live {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--color-cyan);
+  animation: blink 1.1s steps(2, jump-none) infinite;
+}
+.hero-fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(40% 40% at 72% 42%, rgb(255 255 255 / 0.1), transparent 70%);
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}

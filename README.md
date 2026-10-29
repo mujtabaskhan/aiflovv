@@ -1,214 +1,234 @@
 # AiFlovv
 
-The website of AiFlovv, a digital product & software studio in Lahore — a cinematic 3D
-marketing site built as one continuous WebGL journey rather than a stack of sections.
+The website of AiFlovv, a digital product & software studio in Lahore.
 
-**Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Three.js ·
-React Three Fiber · drei · postprocessing · GSAP + ScrollTrigger · Lenis · Zustand ·
-Tailwind CSS v4
+**Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Three.js · GSAP
+(ScrollTrigger, SplitText, ScrambleText, Flip) · Lenis · Tailwind CSS v4
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build
+npm run dev        # http://localhost:3000
+npm run build      # production build + type check (62 routes)
 npm start
+npm run typecheck
 ```
 
+The previous single-page version is archived in `_archive/` (excluded from the build).
+
 ---
 
-## The core idea
+## The idea: "Ideas in. Products out."
 
-The page is a **single persistent `<Canvas>`** fixed behind the document. DOM sections
-scroll normally on top of it and register themselves with a journey model; from the raw
-scroll offset we derive one continuous `stage` float (`2.4` = 40% of the way through
-section index 2). Camera, the interface layouts, lighting and post-processing are all
-keyed off that one number, which is what makes the site read as one visual journey.
+The brand is **AiFlovv**, and the square pixel of its logo is the unit the whole site is
+built from. The site is white and editorial; the hero, page headers, menus, product demos
+and footer are dark "screens" set into it.
 
-Nothing about that loop touches React state. `src/lib/journey.ts` is a plain mutable
-module written by the scroll handler and read inside `useFrame` — scrolling causes **zero
-re-renders**. React state (Zustand) is reserved for low-frequency things like which
-service row is open.
+- **Hero (WebGL).** Thousands of square points stream in from the left — loose, noisy
+  "ideas" — and lock into a pixel grid as a product. It opens on the pixel **AiFlovv**
+  wordmark, then cycles through all eight services (website, phone, AI, software, SaaS
+  dashboard, shopping bag, design canvas, cloud) every ~2.6 s. The headline's word rolls
+  with it ("Websites out.", "Apps out." …) and the ticker links to the matching service
+  page; hovering the ticker pauses the cycle, its segments jump to any service. On phones
+  the product is fitted into the space above the copy.
+- **Preloader.** The AiFlovv wordmark assembles cell by cell beside a short build log and a
+  000 → 100 counter, then hands over to the transition pixels.
+- **Page transitions.** A wave of blue → cyan pixels sweeps across, holds with the
+  destination path (`→ ~/services`), and dissolves into the new page.
+- **Inner pages.** Every hero sits on an LED wall — a 2D canvas of pixels that twinkle and
+  light up around the pointer. Case-study pages re-tint it with the client's own colour.
+- **Details.** A pixel cursor that frames anything clickable, stepped "loading" fills on
+  buttons, pixel arrows, a ⌘K / Ctrl K command palette, a keyboard of tech keycaps, a
+  CI-style process pipeline, generative pixel covers for every article, and a pixel
+  signature in the developer console.
+- **Footer sign-off.** An LED panel that writes "AiFlovv" itself every time it scrolls into
+  view, on every page: each letter is traced along its strokes behind a glowing cyan pen tip,
+  then a cursor blinks. Tap it to write it again; pass the pointer over it and it glows.
 
-### The exploded interface
+Type: **Hubot Sans** (display, expanded), **Mona Sans** (text), **Martian Mono** (labels).
+Colour comes from the logo: navy, the blue of the first V, the cyan of the second.
 
-The 3D layer is a fixed roster of **31 UI screens** — a website, a dashboard, two phone
-apps, a code editor, a terminal, a design board, components, the ten technologies as
-labelled chips, four architecture floors and a closing input — drawn in **one instanced
-draw call**. Every section is a layout function in `src/lib/panels.ts`; the scene
-evaluates the current section's layout and the next one's each frame and blends between
-them, so the same screens reorganise as you scroll:
+---
 
-| Section | Layout |
+## Routes
+
+| Route | |
 | --- | --- |
-| Hero | The product beside the headline: it assembles layer by layer as the preloader lifts, tilts toward the pointer, spreads its layers as you work it, and names whichever layer you hover |
-| Clients | Nothing — the client arc owns the frame |
-| Manifesto | The layers pulling further apart |
-| Services | One product group per service (site, platform, apps, design system), swapping with the active row |
-| Technology | Four floors of architecture with each technology standing on its layer; hovering a row lifts its chip |
-| Work | A corridor of screens receding behind the project portal |
-| Process | Wireframe notes → a grid → coloured design → build → tested on devices → launched |
-| Studio | The finished product, turning slowly; a focused pillar brings its screen forward |
-| Insights | A faint wall of cards far behind the grid |
-| CTA | A tunnel of screens converging on a single waiting input |
+| `/` | Hero, clients, position, services, selected work (pinned horizontal reel), process, toolkit, blogs, CTA |
+| `/services` | All eight services grouped (Build · Intelligence · Design · Operations), process, toolkit |
+| `/services/[slug]` | Eight pages, each composed differently — see below |
+| `/case-studies` | All 11 projects — filter by type, grid or list (list shows a poster that follows the cursor) |
+| `/case-studies/[slug]` | One page per project, tinted with the client's brand colour |
+| `/blogs`, `/blogs/[slug]` | 22 articles — topic filter with counts, search, load more; articles with reading progress, live table of contents, copy link |
+| `/contact` | Brief builder with a live `brief.ts` preview, emailed via `/api/contact` |
+| `/api/contact` | Contact form endpoint (validation, spam filtering, SMTP or Resend delivery) |
+| `/privacy` | Plain-language privacy notice (linked from the footer and the contact form) |
+| `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | Generated from the content files |
+| `…/opengraph-image` | A generated share card for every page (see below) |
 
-Hover is picked in the scene itself — the pointer ray against each hero layer's
-plane — and the label is DOM, fed by `interaction.heroProbe`. Hover and the idle
-pointer drift key off the actual input (`pointerType`), not `(pointer: fine)`, so
-hybrid devices such as a Surface with its cover get both. A soft brand-blue light
-sits behind the hero product (`HeroGlow`), and a light sweep crosses the glass as
-it lands.
+### Navigation
 
-Panels cascade rather than snap (each has its own start offset), lift toward the viewer
-mid-move so the layout visibly comes apart and resettles, and a panel that is hidden on
-one side of a blend materialises in place instead of flying across the frame. The rate of
-change drives chromatic aberration and bloom in the post chain.
+The **Services** item in the nav opens a mega menu: all eight services with their pixel
+glyphs, and a live preview of the hovered service. It opens on hover or click, works with
+the arrow keys and Escape, and the nav turns light while it's open. In the mobile menu,
+Services is an accordion with the same eight links.
 
-Every screen is drawn at runtime into a single canvas atlas (`src/lib/interfaceAtlas.ts`).
-The channels carry meaning rather than colour — R ink, G accent, B secondary fill, all
-three a blinking caret — so the panel shader re-inks the same drawing for the light and
-dark acts, and a `fill` value runs each screen from a bare dashed wireframe to finished
-colour. Panels are depth-sorted every frame so the translucent glass composites in order.
+### Service pages
 
-### Light and dark acts
+Every service shares a few building blocks (`components/services/blocks.tsx`) but has its
+own hero layout, order and interactive "signature" sections
+(`components/services/signatures/`):
 
-The page alternates environment in four acts, keyed off the same `stage` float:
+| Service | Signatures |
+| --- | --- |
+| Web Development | Device switcher (desktop / tablet / phone), page anatomy |
+| Mobile App Development | Phone tour, platform picker (native / cross-platform / PWA) |
+| AI Solutions & Automation | Step-through AI demo (marked "illustrative example"), guardrails |
+| Custom Software Development | Spreadsheet → system comparison slider, architecture explorer |
+| SaaS Product Development | Platform building blocks, roadmap |
+| E-commerce Development | Working mini store + checkout steps, customer journey |
+| UI/UX & Digital Design | Design playground, wireframe → final slider |
+| Cloud & DevOps | Deploy console that runs a pipeline |
 
-| Act | Sections | Environment |
-| --- | --- | --- |
-| I | Hero, Clients, Manifesto, Services | Light — the page's default |
-| II | Technology, Work | Dark — the stack reads as lit architecture, and the portal is a lit screen |
-| III | Process, Studio, Insights | Light — a blueprint |
-| IV | CTA | Dark — climax |
-
-Sections are addressed by id, never by position: `stageOf("cta")` in
-`src/lib/journey.ts` returns a section's stage, so moving or inserting a section only
-means editing `SECTION_IDS`, adding its layout to `LAYOUTS` in `panels.ts`, and one entry
-to each per-stage table (`cameraPath.ts`, `STAGE_LIGHT`).
-
-The Clients section sits straight after the hero. It wraps `src/components/ui/scroll-morph-hero.tsx`
-(adapted from 21st.dev): cards scatter, line up, ring, then open into an arc that sweeps
-through the list as the page scrolls. The list lives in `src/data/clients.ts`.
-
-The page is light by default; dark is reserved for the three sections where it
-buys something specific. The act map is a single array, `STAGE_LIGHT` in
-`src/lib/theme.ts` — flip an entry to move a section between environments and
-everything else follows.
-
-The canvas *is* the background, so this is not a CSS theme toggle. The sky dome
-lerps between two graded palettes, and the panels change technique rather than just
-colour: white cards with soft drop shadows and hairline edges on paper, dark glass with
-lit rims, halos and a bloom-catching accent in the dark.
-
-**The grade changes with the act** (`GradeEffect`). AgX earns its place against black,
-where glows roll off instead of clipping — but on paper the whole frame sits on its
-highlight shoulder, where the curve is nearly flat, and a screen full of UI compresses
-into a pale smudge. So the final grade crossfades to linear as the page turns light, and
-the light acts are authored in display values: the paper renders as its hex colour
-(matching the CSS `--color-void`), a white card is white, and ink is near-black. Bloom
-goes to zero on paper for the same reason.
-
-Foreground and background cannot travel through mid-grey at the same time or
-contrast collapses to zero. So the crossover is staged: it is placed after a
-pinned section releases, the DOM content dips out, the world inverts, and the
-content comes back. The grade's crossfade passes its midpoint inside that dip.
-
-The dark tokens live in CSS under `[data-theme="dark"]`. `ThemeDriver` marks only
-what is on screen — the sections in view and the fixed chrome — and flips the mark
-once per crossover, at its midpoint. Every utility built on those tokens follows
-without any component knowing which environment it is in, and a switch restyles a
-few hundred elements rather than the whole document (every element inherits every
-root variable, so writing theme tokens to `<html>` restyled the entire page).
-
-### No 3D assets
-
-There are no GLTF/GLB models, textures, images or HDRIs anywhere in the 3D layer. Every
-screen is drawn into the atlas at load, the five case-study visuals are procedural GLSL,
-and the sky is a shader. Total 3D asset payload is zero bytes, and nothing has to be
-fetched before the scene can render.
-
----
-
-## Architecture
+## Where things live
 
 ```
 src/
-  app/                 layout, globals.css (design tokens)
+  app/                  routes, layout (fonts, metadata, structured data), template, globals.css
+    styles/             components, sections, pages, visuals, prose
+  content/              ALL copy and data — site, services, work, posts, process, tech
   components/
-    canvas/            3D only — Scene, Rig, Interface, Portal, Atmosphere,
-                       Effects, GradeEffect
-    sections/          one file per section, DOM only
-    ui/                Nav, Preloader, Cursor, Button, Reveal, Overlays, Section
-    providers/         SmoothScroll (Lenis + GSAP ticker + journey updates)
-  shaders/             GLSL as tagged template strings, chunks/ for shared noise
-  lib/                 journey, cameraPath, panels (roster + layouts),
-                       interfaceAtlas, theme, quality, math, palette, gsap
-  data/                services, projects, technologies, process, company,
-                       insights, clients
-  store/               Zustand — low-frequency UI state only
+    shell/              Nav, Menu, Footer, Preloader, Transition (+ TLink), Cursor, CommandPalette
+    motion/             AnimationEngine (attribute-driven reveals), useBatchReveal
+    hero/               HomeHero + FlowField (Three.js)
+    home/               home-page sections
+    services/           service page blocks, ServicePage (per-service composition), signatures/
+    work/ blog/ contact/
+    visuals/            ServiceVisual (8 animated illustrations), PixelCover, PixelField
+    ui/                 Button, Pixels, Section, PageHero, PixelEdge, CtaBlock, Faq
+  lib/                  gsap setup, hero shapes, pixel wordmark, mailer, ready signal, utils
 ```
 
-Shaders are TypeScript string exports rather than `.glsl` files, so no bundler loader is
-needed and the GLSL travels with the code that configures its uniforms.
+To change copy, edit `src/content/`. Pages are generated from those files.
 
----
+### Animation engine
 
-## Performance
+Server components opt into motion with attributes — no client wrapper needed:
 
-Device capability is detected once before the canvas mounts (`src/lib/quality.ts`) and
-resolved into a single profile — DPR, texture filtering, which post passes run. Everything expensive reads from that profile, so there are no scattered
-"is this mobile?" checks.
+```html
+<h2 data-anim="lines">…</h2>          lines rise out of masks
+<h1 data-anim="chars">…</h1>          characters rise in
+<p data-anim="words">…</p>            words light up as you scroll (scrubbed)
+<p data-anim="scramble">…</p>         decodes from glyphs
+<div data-anim="pixel">…</div>        media dissolves out of pixels
+<div data-anim="up|fade|clip|stagger|rule">…</div>
+data-delay="0.2"  data-start="top 80%"  data-speed="0.15" (parallax)  data-magnetic
+```
 
-- drei's `PerformanceMonitor` drops a tier if the frame budget is genuinely blown.
-- The whole interface is one instanced draw; only two layouts are evaluated per frame,
-  and hidden panels are culled from the instance count before upload.
-- Section props fade in and out against `stage` rather than mounting/unmounting, so no
-  shader is ever compiled mid-scroll.
-- Manually created geometries and materials are disposed on unmount; declarative ones are
-  handled by R3F.
-- The full-screen atmosphere shader runs two noise octaves, not four — at four it was the
-  single most expensive thing in the frame for a detail nobody can consciously see.
-- The WebGL bundle is `dynamic(..., { ssr: false })` and only mounts after capability
-  detection.
+`src/components/motion/AnimationEngine.tsx` waits for the page to be visible (preloader or
+transition finished) and rebuilds on every route. Lists that change client-side (filters)
+use `useBatchReveal` instead.
 
-On portrait viewports the layouts narrow and the product groups drop to a backdrop
-wherever the copy stacks over them, and the work portal scales to a plane the frame can
-actually contain — the mobile experience is simplified deliberately, not just shrunk.
+### Notes for whoever works on this next
 
-### Fallbacks
+- **Pin inner wrappers, never a component's root.** ScrollTrigger wraps pinned elements in
+  a spacer; React must still find a component's root where it left it on unmount.
+- **Pointer effects key off `pointerType`, not media queries.** Hybrid devices (a Surface,
+  touch laptops) report `hover: none` while a mouse is in use.
+- **Lenis owns scrolling.** In development, `window.__lenis` is exposed for QA
+  (`__lenis.scrollTo(y, { immediate: true })`).
+- **Reduced motion** turns off smooth scrolling, the preloader, transitions and entrance
+  animations; the hero renders a still frame.
 
-- **No WebGL** → a static CSS backdrop; every section stays fully readable and usable.
-- **`prefers-reduced-motion`** → smooth scrolling off, intro compressed, motion damped.
+## Launch checklist
 
----
+The site builds and runs as-is. Before pointing aiflovv.com at it:
 
-## QA affordances
+1. **Email** — set the contact-form variables (next section) in the host's environment and
+   send yourself a test brief from the live site.
+2. **Domain** — the canonical URLs, sitemap and share cards assume `https://aiflovv.com`
+   (`SITE.url` in `src/content/site.ts`). Redirect `www` to it (or change `SITE.url`).
+3. **Host** — any Node host works (`npm run build && npm start`); Vercel needs no config.
+   The contact rate limit is kept in memory, per server instance.
+4. **Search** — after launch, add the site to Google Search Console and submit
+   `/sitemap.xml`.
+5. **Review** — read the privacy page (`src/app/privacy/page.tsx`) and the content notes at
+   the end of this file.
 
-Query parameters, development only in spirit but harmless in production:
+### Built in
 
-| Param | Effect |
+- **Share cards** — every page has its own 1200×630 image (`opengraph-image.tsx` per route,
+  drawn by `src/lib/og.tsx`): the pixel wordmark, the page's pixel glyph and the white pixel
+  skyline. Articles show their category and reading time; case studies are tinted with
+  the client's colour.
+- **Metadata** — unique title, description (≤ 160 characters), canonical URL, Open Graph and
+  Twitter card per page (`src/lib/meta.ts`), plus Organization / WebSite / BlogPosting
+  structured data. Pages carry their trail (Home › Services › Web Development) as
+  BreadcrumbList data for search results rather than as a visible breadcrumb.
+- **Security headers** (`next.config.ts`) — Content-Security-Policy (production only),
+  HSTS, nosniff, Referrer-Policy, frame protection, Permissions-Policy; no `X-Powered-By`.
+- **Errors** — branded 404, a branded error page with *Try again*, and a last-resort
+  `global-error` screen.
+- **Accessibility** — text colours meet WCAG AA contrast on every surface, one `h1` per page
+  with no skipped heading levels, labelled controls, skip link, reduced-motion support.
+- **Performance** — static pages, self-hosted fonts, display-sized logo images, and pixel
+  art drawn as merged paths (the home page went from ~5,200 DOM nodes to ~3,100).
+- **Responsive** — checked at 320, 390, 768, 1024, 1280, 1440 and 1920 px: no sideways
+  scrolling, and display titles never split a word — `.fit` titles size themselves to the
+  column they sit in (`src/lib/fit.ts`). Small controls get a 24 px+ tap area (`.hit`).
+
+## Contact form
+
+`/api/contact` validates the brief (name, email, message; needs and timeline from fixed
+lists), drops obvious bots (a hidden honeypot field and forms sent in under 1.5 s), limits
+each IP to 5 messages per 10 minutes, then emails the brief to the studio with the
+visitor's address as Reply-To. It never claims success unless the mail provider accepted
+the message.
+
+**To turn delivery on,** copy `.env.example` to `.env.local` (or set the same variables in
+your host's dashboard) and fill in **one** provider:
+
+| Variable | |
 | --- | --- |
-| `?q=low` / `?q=mid` / `?q=high` | Force a quality tier |
-| `?webgl=off` | Exercise the no-WebGL fallback (a static light backdrop) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Option A — any SMTP mailbox. For Gmail / Google Workspace: `smtp.gmail.com`, port `465`, your address, and an [App Password](https://myaccount.google.com/apppasswords) (needs 2-Step Verification). `SMTP_SECURE` is optional (defaults to true on port 465). |
+| `RESEND_API_KEY` | Option B — [Resend](https://resend.com) HTTP API, with your domain verified there |
+| `CONTACT_TO` | Where briefs go (defaults to info@aiflovv.com) |
+| `CONTACT_FROM` | A sender your provider allows, e.g. `AiFlovv Website <website@aiflovv.com>` (for Gmail, your own address) |
+| `CONTACT_ACK` | Optional — `true` also sends the visitor a short "we've received your brief" email |
 
-In development the console also exposes `window.__gsap`, `window.__three`,
-`window.__lenis` and `window.__journey`. Note that **Lenis owns the scroll position** — `window.scrollTo` gets
-overwritten on the next frame, so use `__lenis.scrollTo(y, { immediate: true })`.
+What visitors see:
 
----
+- **Sent** — "Brief received." with their first name and email.
+- **Delivery failed** (provider down or rejected) — an error panel with *Try again* and *Send
+  via email* (opens their mail app with the whole brief filled in). Nothing they typed is lost.
+- **Not configured** — the same mail-app fallback; in development the panel also lists the
+  missing variables.
 
-## Content
+Delivery was tested end to end against a local SMTP server: the brief arrived with the
+correct From / To / Reply-To, and the acknowledgement reached the visitor.
 
-Company details (`src/data/company.ts`) and the client arc (`src/data/clients.ts`, taken
-from the studio portfolio) are real.
+## Content — please review before launch
 
-**Still placeholder copy, to replace before launch:** the Selected Work case studies
-(`src/data/projects.ts` — FinCore, Northline, MedFlow, Cartiq, AtlasOps) with their
-metrics, and the Insights stories that repeat them (`src/data/insights.ts`).
-
-## Metadata
-
-Search and share metadata lives in `src/app/layout.tsx` (title, description, Open Graph,
-Twitter card, structured data) and the file conventions beside it: `favicon.ico`,
-`icon.png`, `apple-icon.png`, `opengraph-image.png` / `twitter-image.png` (1200×630),
-`manifest.ts`, `robots.ts` and `sitemap.ts`. Everything reads from `COMPANY` — the
-canonical domain is `COMPANY.url`.
+- **Case studies** are the 11 real projects from the portfolio. Descriptions, platforms and
+  stacks come from each project poster; there are no invented metrics. The old placeholder
+  studies (FinCore, Northline, MedFlow, Cartiq, AtlasOps) and their figures were removed.
+- **Project posters** are 360 px wide. Higher-resolution exports (or real screenshots)
+  would sharpen the case-study pages noticeably.
+- **Blog articles** (22) are original writing for this site — review them for voice and
+  accuracy. Sixteen of them take their *topics* from subjects covered on
+  [Devsinc's blog](https://www.devsinc.com/blog); no text was copied. The topics used are
+  listed at the top of each file in `src/content/posts/`:
+  vibe-coded software's real cost · AI in mobile apps · agentic AI (chatbot vs RAG vs
+  agent) · AI workflow automation · website mistakes small businesses make · what drives
+  website cost · questions before hiring a developer · responsive vs adaptive design ·
+  why projects slip · mobile app process from idea to launch · native vs cross-platform ·
+  scalable custom software · system integration · international e-commerce · headless
+  commerce · DevOps to DevSecOps.
+- **Services** grew from four to eight. The four new ones (AI Solutions & Automation, SaaS
+  Product Development, E-commerce Development, Cloud & DevOps) need a read-through to
+  confirm they match what AiFlovv sells. AI Solutions shows no case studies, because none
+  of the portfolio projects is an AI project.
+- **Demo content** on service pages is clearly illustrative: the store demo's products and
+  prices, and the AI demo (labelled "Illustrative example").
+- **Toolkit** adds .NET and MySQL to the original ten technologies, since most portfolio
+  projects list them.
+- The old "100% / 4.8/5 / 99.9%" pillar figures were dropped.

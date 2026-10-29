@@ -1,39 +1,26 @@
-"use client";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
-import { useRef, type ReactNode } from "react";
-import { registerSection, type SectionId } from "@/lib/journey";
-import { useIsomorphicLayoutEffect } from "@/lib/gsap";
-
-interface SectionProps {
-  id: SectionId;
-  className?: string;
-  children: ReactNode;
-  /** Rendered as the scroll spacer; content is usually sticky inside it. */
-  label?: string;
+/** A small label that heads a list on its own ("Stack", "Keep reading") — decodes from glyphs. */
+export function SectionLabel({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <p className={cn("t-label label-px text-muted", className)} data-anim="scramble">
+      {children}
+    </p>
+  );
 }
 
-/**
- * Registers itself with the journey model so the 3D layer knows exactly where
- * it sits in the scroll. Sections never set their own background — the canvas
- * behind them is the background.
- */
-export function Section({ id, className = "", children, label }: SectionProps) {
-  const ref = useRef<HTMLElement>(null);
-
-  useIsomorphicLayoutEffect(() => {
-    registerSection(id, ref.current);
-    return () => registerSection(id, null);
-  }, [id]);
-
+export function SectionHead({ title, lead, className }: { title: ReactNode; lead?: ReactNode; className?: string }) {
   return (
-    <section
-      ref={ref}
-      id={id}
-      data-section={id}
-      aria-label={label}
-      className={`relative ${className}`}
-    >
-      {children}
-    </section>
+    <div className={cn("section-head", className)}>
+      <h2 className="t-h2" data-anim="lines">
+        {title}
+      </h2>
+      {lead && (
+        <p className="t-lead" data-anim="up" data-delay="0.15">
+          {lead}
+        </p>
+      )}
+    </div>
   );
 }
